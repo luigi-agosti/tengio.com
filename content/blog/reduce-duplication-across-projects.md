@@ -16,6 +16,7 @@ During the last couple of months in Tengio we have created a few open source lib
 It is time to have a deeper look at the gradle build scripts and plugins that we use and extract the duplication where possible.
 
 I set the following requirements for this task:
+
 * Cost in terms of my time should not be more than 2 days
 * The abstraction should not increase the learning curve for other developers in the team
 * The changes should affect positively more than 1 project.
@@ -23,8 +24,9 @@ I set the following requirements for this task:
 ## Duplication in gradle scripts
 
 It is quite easy to identify the primary source of duplication in the gradle scripts of our projects. Just by reading through a few project ```build.gradle``` files I have identified the following parts:
-- checkstyle
-- bintray
+
+* checkstyle
+* bintray
 
 ## Checkstyle
 
@@ -33,22 +35,26 @@ I hope people reading this blog are familiar with checkstyle. If you are not ple
 The best way to take advantage of checkstyle is to create a company wide code style rule set that is as close as possible to the current standard style guidelines of you project type. Once the rule set is defined you can enforce the rules in the static code analysis phase of the build scripts and at the same time help developers use the rules with some IDE integration. 
 
 To summarise if you want to use checkstyle, you have to:
+
 * enforce it in your continuous integration
 * integrate it in your IDE
+
 Any friction between these two rules and you will have more issues using checkstyle than not using it.
 
 In this case I'm looking at java/android base projects. For this type of projects you can implement checkstyle with the following steps: 
-- define the rules of your code style in a file ```checkstyle.xml```.   
-- add the checkstyle plugin to your gradle project.
-- create a ```codestyle.xml``` file, and import the file in your IDE (at least this should work for android studio and IntelliJ).
+
+* define the rules of your code style in a file ```checkstyle.xml```.   
+* add the checkstyle plugin to your gradle project.
+* create a ```codestyle.xml``` file, and import the file in your IDE (at least this should work for android studio and IntelliJ).
 
 ## Checkstyle implementation problem
 
 As mentioned before, the codestyle implementation for a project consists of the following files:
-- codestyle.xml
-- checkstyle.xml
-- Plugin repository definition and dependency
-- For android project you also need the ridefinition of the checkstyle task so that it can take the proper source code to analyse.
+
+* codestyle.xml
+* checkstyle.xml
+* Plugin repository definition and dependency
+* For android project you also need the ridefinition of the checkstyle task so that it can take the proper source code to analyse.
 
 All this is fine for a single project, but as soon as you start to have a few projects you end up with lots of duplications which are expensive to maintain.
 
@@ -70,15 +76,16 @@ checkstyle.config = project.resources.text.fromString(getClass().getResourceAsSt
 Ok now I have to learn how to create a gradle plugin, inject a checkstyle plugin and make sure it is configured correctly.
 
 These are the things we need to do:
-- 1. create a gradle plugin project
-- 2. define a plugin id
-- 3. define the plugin class
-- 4. Checkstyle plugin dependency
-- 5. apply the Checkstyle plugin
-- 6. try the plugin 
-- 7. add support for android projects
-- 8. publish the plugin
-- 9. update existing projects to use the new plugin
+
+* 1. create a gradle plugin project
+* 2. define a plugin id
+* 3. define the plugin class
+* 4. Checkstyle plugin dependency
+* 5. apply the Checkstyle plugin
+* 6. try the plugin 
+* 7. add support for android projects
+* 8. publish the plugin
+* 9. update existing projects to use the new plugin
 
 ### 1. Create a gradle plugin project
 
